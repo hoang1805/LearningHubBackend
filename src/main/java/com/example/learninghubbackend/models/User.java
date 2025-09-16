@@ -13,6 +13,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity()
 @Table(name = "users")
@@ -56,6 +61,10 @@ public class User extends BaseModel implements Exportable, Releasable<UserReleas
         this.phone = phone;
         this.role = role;
         this.gender = gender;
+    }
+
+    public List<GrantedAuthority> getAuthorities() {
+        return List.of(role.getAuthority());
     }
 
     @Override

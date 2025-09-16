@@ -2,9 +2,11 @@ package com.example.learninghubbackend.configs.filters;
 
 import com.example.learninghubbackend.commons.ClientInfo;
 import com.example.learninghubbackend.models.Session;
+import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.services.auth.session.SessionService;
 import com.example.learninghubbackend.services.jwt.JwtPayload;
 import com.example.learninghubbackend.services.jwt.JwtService;
+import com.example.learninghubbackend.services.user.UserService;
 import com.example.learninghubbackend.utils.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,6 +28,7 @@ import java.util.Collections;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final SessionService sessionService;
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
@@ -41,14 +44,13 @@ public class JwtFilter extends OncePerRequestFilter {
             ClientInfo clientInfo = ClientInfo.getClientInfo(request);
             Session session = sessionService.query().getSession(payload.getSessionId());
             boolean active = false;
-            if (session == null || !session.getUserId().equals(payload.getUserId()) || session.isRevoked()) {
-                active = false;
-            } else {
+            if (session != null && session.getUserId().equals(payload.getUserId()) && !session.isRevoked()) {
                 active = verifyClient(clientInfo, session);
             }
 
             if (active) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(session.getUserId(), null, Collections.emptyList());
+                User user = userService.query().getUser(payload.getUserId());
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(session.getUserId(), null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             } else {
                 SecurityContextHolder.clearContext();
