@@ -1,9 +1,9 @@
 package com.example.learninghubbackend.models;
 
-import com.example.learninghubbackend.commons.ExportData;
-import com.example.learninghubbackend.commons.Exportable;
-import com.example.learninghubbackend.commons.ObjectType;
-import com.example.learninghubbackend.commons.Releasable;
+import com.example.learninghubbackend.commons.models.ExportData;
+import com.example.learninghubbackend.commons.models.Exportable;
+import com.example.learninghubbackend.commons.models.ObjectType;
+import com.example.learninghubbackend.commons.models.Releasable;
 import com.example.learninghubbackend.dtos.responses.user.UserRelease;
 import com.example.learninghubbackend.dtos.responses.user.UserReleaseCompact;
 import com.example.learninghubbackend.services.user.Gender;

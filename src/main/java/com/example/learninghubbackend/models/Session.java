@@ -1,6 +1,6 @@
 package com.example.learninghubbackend.models;
 
-import com.example.learninghubbackend.commons.ObjectType;
+import com.example.learninghubbackend.commons.models.ObjectType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

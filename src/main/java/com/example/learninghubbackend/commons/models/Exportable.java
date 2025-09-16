@@ -1,4 +1,4 @@
-package com.example.learninghubbackend.commons;
+package com.example.learninghubbackend.commons.models;
 
 public interface Exportable {
     ExportData export();
