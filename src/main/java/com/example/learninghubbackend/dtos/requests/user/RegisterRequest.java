@@ -18,4 +18,6 @@ public class RegisterRequest {
     public String password;
 
     public String confirmPassword;
+
+    public String role;
 }

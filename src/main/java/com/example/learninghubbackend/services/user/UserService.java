@@ -2,21 +2,15 @@ package com.example.learninghubbackend.services.user;
 
 import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserReader userReader;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public User getUser(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+    public UserReader reader() {
+        return userReader;
     }
 }

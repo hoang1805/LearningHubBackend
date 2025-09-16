@@ -22,6 +22,10 @@ public class BaseResponse<T> {
         return new BaseResponse<>(true, "", data, 0);
     }
 
+    public static BaseResponse<Void> success() {
+        return new BaseResponse<>(true, "", null, 0);
+    }
+
     public static <T> BaseResponse<T> error(String message, T data, int code) {
         return new BaseResponse<>(false, message, data, code);
     }
