@@ -23,7 +23,7 @@ public class UserReader {
         readRole(user, request.role);
 
         user.setGender(request.gender);
-        return userQuery.save(user);
+        return user;
     }
 
     private void readUsername(User user, String username) {

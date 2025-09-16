@@ -9,8 +9,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     private final UserReader userReader;
+    private final UserQuery userQuery;
 
     public UserReader reader() {
         return userReader;
+    }
+
+    public UserQuery query() {
+        return userQuery;
     }
 }

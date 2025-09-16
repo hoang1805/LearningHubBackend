@@ -46,20 +46,8 @@ public class User extends BaseModel implements Exportable, Releasable<UserReleas
         return ObjectType.USER.getValue();
     }
 
-    public User(Long creatorId, Long id, String username, String password, String name, String email, String phone, Role role, Gender gender) {
-        super(creatorId);
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.role = role;
-        this.gender = gender;
-    }
-
-    public User(Long creatorId, Long createdAt, Long updatedAt, Long id, String username, String password, String name, String email, String phone, Role role, Gender gender) {
-        super(creatorId, createdAt, updatedAt);
+    public User(Long id, String username, String password, String name, String email, String phone, Role role, Gender gender, Long createdAt, Long updatedAt) {
+        super(createdAt, updatedAt);
         this.id = id;
         this.username = username;
         this.password = password;
@@ -85,7 +73,7 @@ public class User extends BaseModel implements Exportable, Releasable<UserReleas
         UserRelease data = new UserRelease();
         return data.setId(id).setUsername(username).setName(name)
                 .setEmail(email).setPhone(phone).setRole(role).setGender(gender)
-                .setCreatorId(getCreatorId()).setCreatedAt(getCreatedAt()).setUpdatedAt(getUpdatedAt());
+                .setCreatedAt(getCreatedAt()).setUpdatedAt(getUpdatedAt());
     }
 
     @Override

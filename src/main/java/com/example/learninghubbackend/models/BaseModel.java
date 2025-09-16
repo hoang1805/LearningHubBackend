@@ -10,9 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class BaseModel {
-    @Column(name = "creator_id")
-    private Long creatorId;
-
     @Column(name = "created_at")
     private Long createdAt;
 
@@ -20,16 +17,11 @@ public abstract class BaseModel {
     private Long updatedAt;
 
     public BaseModel() {
-    }
-
-    public BaseModel(Long creatorId) {
-        this.creatorId = creatorId;
         this.createdAt = TimerUtil.now();
         this.updatedAt = createdAt;
     }
 
-    public BaseModel(Long creatorId, Long createdAt, Long updatedAt) {
-        this.creatorId = creatorId;
+    public BaseModel(Long createdAt, Long updatedAt) {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
