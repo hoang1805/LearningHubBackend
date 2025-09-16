@@ -1,16 +1,15 @@
 package com.example.learninghubbackend.controllers;
 
 import com.example.learninghubbackend.commons.exceptions.NotFoundException;
+import com.example.learninghubbackend.dtos.requests.user.ChangePasswordRequest;
 import com.example.learninghubbackend.dtos.responses.BaseResponse;
 import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "api/user")
@@ -31,6 +30,21 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success(user.release())
+        );
+    }
+
+    @PutMapping("/change/password")
+    public ResponseEntity<Object> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.query().getUser(userId);
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+
+        userService.reader().changePassword(user, changePasswordRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success()
         );
     }
 }

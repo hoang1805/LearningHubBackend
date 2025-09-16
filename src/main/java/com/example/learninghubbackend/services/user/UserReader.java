@@ -3,6 +3,8 @@ package com.example.learninghubbackend.services.user;
 import com.example.learninghubbackend.commons.exceptions.AlreadyExists;
 import com.example.learninghubbackend.commons.exceptions.InvalidField;
 import com.example.learninghubbackend.commons.exceptions.InvalidPassword;
+import com.example.learninghubbackend.commons.exceptions.PasswordNotMatch;
+import com.example.learninghubbackend.dtos.requests.user.ChangePasswordRequest;
 import com.example.learninghubbackend.dtos.requests.user.RegisterRequest;
 import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.utils.HashUtil;
@@ -26,6 +28,27 @@ public class UserReader {
         readRole(user, request.role);
 
         user.setGender(request.gender);
+        return userQuery.save(user);
+    }
+
+    public User changePassword(User user, ChangePasswordRequest request) {
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordNotMatch("New password");
+        }
+
+        if (!ReaderUtil.isValidPassword(request.getOldPassword())) {
+            throw new InvalidPassword();
+        }
+
+        if (!ReaderUtil.isValidPassword(request.getNewPassword())) {
+            throw new InvalidPassword("new password");
+        }
+
+        if (!HashUtil.verify(user.getPassword(), request.getOldPassword())) {
+            throw new InvalidField("password", "Wrong password");
+        }
+
+        readPassword(user, request.getNewPassword());
         return userQuery.save(user);
     }
 
