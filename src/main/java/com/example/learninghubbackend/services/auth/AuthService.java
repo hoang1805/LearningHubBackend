@@ -38,8 +38,7 @@ public class AuthService {
 
         sessionService.query().revokeByUser(user.getId());
 
-        Session session = sessionService.createSession(user, clientInfo);
-        return sessionService.query().save(session);
+        return sessionService.createSession(user, clientInfo);
     }
 
     public void logout(Long userId) {
