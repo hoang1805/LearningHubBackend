@@ -42,5 +42,7 @@ public class AuthService {
         return sessionService.query().save(session);
     }
 
-    public void logout(String userId) {}
+    public void logout(Long userId) {
+        sessionService.query().revokeByUser(userId);
+    }
 }
