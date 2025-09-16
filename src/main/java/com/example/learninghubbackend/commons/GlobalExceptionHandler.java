@@ -26,6 +26,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception e) {
+        System.out.println(e);
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value())
         );

@@ -1,6 +1,7 @@
 package com.example.learninghubbackend.dtos.requests.user;
 
 import com.example.learninghubbackend.services.user.Gender;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -17,6 +18,7 @@ public class RegisterRequest {
 
     public String password;
 
+    @JsonProperty("confirm_password")
     public String confirmPassword;
 
     public String role;

@@ -1,15 +1,21 @@
 package com.example.learninghubbackend.controllers;
 
+import com.example.learninghubbackend.commons.PropertiesData;
 import com.example.learninghubbackend.commons.exceptions.PasswordNotMatch;
 import com.example.learninghubbackend.dtos.requests.auth.LoginRequest;
 import com.example.learninghubbackend.dtos.requests.user.RegisterRequest;
 import com.example.learninghubbackend.dtos.responses.BaseResponse;
+import com.example.learninghubbackend.models.Session;
 import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.commons.ClientInfo;
 import com.example.learninghubbackend.services.auth.AuthService;
 import com.example.learninghubbackend.services.auth.session.SessionService;
+import com.example.learninghubbackend.services.jwt.JwtPayload;
+import com.example.learninghubbackend.services.jwt.JwtService;
 import com.example.learninghubbackend.services.user.UserService;
+import com.example.learninghubbackend.utils.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +27,20 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final UserService userService;
     private final AuthService authService;
+    private final JwtService jwtService;
+    private final PropertiesData propertiesData;
 
-    @GetMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest, HttpServletRequest servletRequest) {
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         ClientInfo clientInfo = ClientInfo.getClientInfo(servletRequest);
-        authService.login(loginRequest, clientInfo);
+        Session session = authService.login(loginRequest, clientInfo);
+        JwtPayload payload = new JwtPayload(session.getId(), session.getUserId());
+        String accessToken = jwtService.generateAccessToken(payload);
+        String refreshToken = jwtService.generateRefreshToken(payload);
+
+        servletResponse.addCookie(CookieUtil.generateCookie("access_token", accessToken, "/", propertiesData.getEnvironment().getProperty("app.jwt.expire.accessToken", "10m")));
+        servletResponse.addCookie(CookieUtil.generateCookie("refresh_token", refreshToken, "/", propertiesData.getEnvironment().getProperty("app.jwt.expire.refreshToken", "60d")));
+
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.success());
     }
 
@@ -36,7 +51,6 @@ public class AuthController {
         }
 
         User user = userService.reader().createUser(request);
-        userService.query().save(user);
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.success());
     }

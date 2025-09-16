@@ -9,7 +9,7 @@ import java.io.IOException;
 public class ClientUtil {
     private static Parser parser;
 
-    public static Parser getParser() throws IOException {
+    public static Parser getParser() {
         if (parser == null) {
             parser = new Parser();
         }
@@ -61,6 +61,6 @@ public class ClientUtil {
             return null;
         }
 
-        return parser.parse(userAgentString);
+        return getParser().parse(userAgentString);
     }
 }

@@ -63,6 +63,17 @@ public class User extends BaseModel implements Exportable, Releasable<UserReleas
         this.gender = gender;
     }
 
+    public User(String username, String password, String name, String email, String phone, Role role, Gender gender) {
+        super();
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.role = role;
+        this.gender = gender;
+    }
+
     public List<GrantedAuthority> getAuthorities() {
         return List.of(role.getAuthority());
     }
