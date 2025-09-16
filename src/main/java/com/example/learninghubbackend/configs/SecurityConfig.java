@@ -1,13 +1,18 @@
 package com.example.learninghubbackend.configs;
 
 import com.example.learninghubbackend.commons.PropertiesData;
+import com.example.learninghubbackend.configs.filters.JwtFilter;
+import com.example.learninghubbackend.configs.filters.ThrottlingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.NullSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -18,15 +23,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final PropertiesData propertiesData;
+    private final JwtFilter jwtFilter;
+    private final ThrottlingFilter throttlingFilter;
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        http.cors(cors -> getCorsConfigurationSource())
+        http.cors(cors -> cors.configurationSource(getCorsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/public/**").permitAll()
                         .anyRequest().authenticated())
-                .securityContext(securityContext -> securityContext.securityContextRepository(new HttpSessionSecurityContextRepository()))
+                .securityContext(securityContext -> securityContext.securityContextRepository(new NullSecurityContextRepository()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable);
+
+        http.addFilterBefore(throttlingFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

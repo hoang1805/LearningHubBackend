@@ -1,5 +1,6 @@
 package com.example.learninghubbackend.commons;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PropertiesData {
+    @Getter
     private final Environment environment;
     private String client;
     private Integer rateLimit;
