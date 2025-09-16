@@ -1,6 +1,7 @@
 package com.example.learninghubbackend.configs.filters;
 
 import com.example.learninghubbackend.commons.ClientInfo;
+import com.example.learninghubbackend.commons.exceptions.InvalidJwtToken;
 import com.example.learninghubbackend.models.Session;
 import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.services.auth.session.SessionService;
@@ -39,24 +40,21 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            JwtPayload payload = jwtService.validateToken(accessTokenValue);
-            ClientInfo clientInfo = ClientInfo.getClientInfo(request);
-            Session session = sessionService.query().getSession(payload.getSessionId());
-            boolean active = false;
-            if (session != null && session.getUserId().equals(payload.getUserId()) && !session.isRevoked()) {
-                active = verifyClient(clientInfo, session);
-            }
+        JwtPayload payload = jwtService.validateToken(accessTokenValue);
+        ClientInfo clientInfo = ClientInfo.getClientInfo(request);
+        Session session = sessionService.query().getSession(payload.getSessionId());
+        boolean active = false;
+        if (session != null && session.getUserId().equals(payload.getUserId()) && !session.isRevoked()) {
+            active = verifyClient(clientInfo, session);
+        }
 
-            if (active) {
-                User user = userService.query().getUser(payload.getUserId());
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(session.getUserId(), null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            } else {
-                SecurityContextHolder.clearContext();
-            }
-        } catch (Exception e) {
+        if (active) {
+            User user = userService.query().getUser(payload.getUserId());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(session.getUserId(), null, user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        } else {
             SecurityContextHolder.clearContext();
+            throw new InvalidJwtToken();
         }
 
         filterChain.doFilter(request, response);

@@ -1,12 +1,11 @@
 package com.example.learninghubbackend.services.throttling;
 
+import com.example.learninghubbackend.commons.exceptions.TimeoutRequest;
+import com.example.learninghubbackend.commons.exceptions.TooManyRequests;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeoutException;
 
 public class TimedTask implements Task {
     private final Runnable runnable;
@@ -30,11 +29,11 @@ public class TimedTask implements Task {
 
     @Override
     public void onExpired() {
-        future.completeExceptionally(new TimeoutException());
+        future.completeExceptionally(new TimeoutRequest());
     }
 
     public void onFull() {
-        future.completeExceptionally(new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS));
+        future.completeExceptionally(new TooManyRequests());
     }
 
     public void run() {

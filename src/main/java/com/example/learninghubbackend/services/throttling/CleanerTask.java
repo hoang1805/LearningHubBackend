@@ -16,7 +16,14 @@ public class CleanerTask implements Task {
     @Override
     public void run() {
         try {
-            queue.removeIf(Task::isExpired);
+            queue.removeIf(task -> {
+                if (task.isExpired()) {
+                    task.onExpired();
+                    return true;
+                }
+
+                return false;
+            });
         } finally {
             // reset flag so we can enqueue cleaner again in the future
             flag.set(false);

@@ -1,5 +1,8 @@
 package com.example.learninghubbackend.services.user;
 
+import com.example.learninghubbackend.commons.exceptions.AlreadyExists;
+import com.example.learninghubbackend.commons.exceptions.InvalidField;
+import com.example.learninghubbackend.commons.exceptions.InvalidPassword;
 import com.example.learninghubbackend.dtos.requests.user.RegisterRequest;
 import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.utils.HashUtil;
@@ -34,11 +37,11 @@ public class UserReader {
         username = ReaderUtil.readString(username);
 
         if (!ReaderUtil.isValidUsername(username)) {
-            throw new IllegalStateException("Invalid username: " + username);
+            throw new InvalidField("username");
         }
 
         if (userQuery.existByUsername(username)) {
-            throw new IllegalStateException("Username " + username + " already exists");
+            throw new AlreadyExists("Username", username);
         }
 
         user.setUsername(username);
@@ -46,7 +49,7 @@ public class UserReader {
 
     private void readPassword(User user, String password) {
         if (!ReaderUtil.isValidPassword(password)) {
-            throw new IllegalStateException("Invalid password: " + password);
+            throw new InvalidPassword();
         }
 
         user.setPassword(HashUtil.hash(password));
@@ -55,7 +58,7 @@ public class UserReader {
     private void readEmail(User user, String email) {
         email = ReaderUtil.readString(email);
         if (!ReaderUtil.isValidEmail(email)) {
-            throw new IllegalStateException("Invalid email: " + email);
+            throw new InvalidField("email");
         }
 
         user.setEmail(email);
@@ -68,7 +71,7 @@ public class UserReader {
         }
 
         if (!ReaderUtil.isValidPhoneNumber(phone)) {
-            throw new IllegalStateException("Invalid phone number: " + phone);
+            throw new InvalidField("phone number");
         }
 
         user.setPhone(phone);
@@ -77,7 +80,7 @@ public class UserReader {
     private void readName(User user, String name) {
         name = ReaderUtil.readString(name);
         if (!ReaderUtil.isValidString(name)) {
-            throw new IllegalStateException("Invalid name: " + name);
+            throw new InvalidField("name");
         }
 
         user.setName(name);
@@ -86,7 +89,7 @@ public class UserReader {
     private void readRole(User user, String role) {
         Role r = Role.fromString(ReaderUtil.readString(role));
         if (r != Role.TEACHER && r != Role.STUDENT) {
-            throw new IllegalStateException("Invalid role: " + role);
+            throw new InvalidField("role");
         }
 
         user.setRole(r);

@@ -1,6 +1,7 @@
 package com.example.learninghubbackend.services.jwt;
 
 import com.example.learninghubbackend.commons.PropertiesData;
+import com.example.learninghubbackend.commons.exceptions.InvalidJwtToken;
 import com.example.learninghubbackend.utils.TimerUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -54,7 +55,7 @@ public class JwtService {
             Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
             return getPayload(claims);
         } catch (JwtException e) {
-            throw new RuntimeException(e);
+            throw new InvalidJwtToken();
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.learninghubbackend.controllers;
 
+import com.example.learninghubbackend.commons.exceptions.PasswordNotMatch;
 import com.example.learninghubbackend.dtos.requests.auth.LoginRequest;
 import com.example.learninghubbackend.dtos.requests.user.RegisterRequest;
 import com.example.learninghubbackend.dtos.responses.BaseResponse;
@@ -31,7 +32,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody RegisterRequest request) {
         if (!request.password.equals(request.confirmPassword)) {
-            throw new IllegalStateException("Passwords do not match");
+            throw new PasswordNotMatch();
         }
 
         User user = userService.reader().createUser(request);

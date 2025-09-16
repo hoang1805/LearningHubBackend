@@ -1,12 +1,15 @@
 package com.example.learninghubbackend.services.auth;
 
 import com.example.learninghubbackend.commons.ClientInfo;
+import com.example.learninghubbackend.commons.exceptions.InvalidLogin;
+import com.example.learninghubbackend.commons.exceptions.InvalidPassword;
 import com.example.learninghubbackend.dtos.requests.auth.LoginRequest;
 import com.example.learninghubbackend.models.Session;
 import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.services.auth.session.SessionService;
 import com.example.learninghubbackend.services.user.UserService;
 import com.example.learninghubbackend.utils.HashUtil;
+import com.example.learninghubbackend.utils.ReaderUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +24,16 @@ public class AuthService {
     public Session login(LoginRequest loginRequest, ClientInfo clientInfo) {
         User user = userService.query().getUserByUsername(loginRequest.username);
         if (user == null) {
-            throw new IllegalStateException("Username or password is invalid");
+            throw new InvalidLogin();
         }
 
         String password = loginRequest.password;
+        if (!ReaderUtil.isValidPassword(password)) {
+            throw new InvalidPassword();
+        }
+
         if (!HashUtil.verify(user.getPassword(), password)) {
-            throw new IllegalStateException("Username or password is invalid");
+            throw new InvalidLogin();
         }
 
         sessionService.query().revokeByUser(user.getId());
