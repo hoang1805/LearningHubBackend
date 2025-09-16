@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -19,15 +20,20 @@ import java.util.concurrent.CompletionException;
 @RequiredArgsConstructor
 public class ThrottlingFilter extends OncePerRequestFilter {
     private final ThrottlingService throttlingService;
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        throttlingService.consume(() -> {
-            try {
-                filterChain.doFilter(request, response);
-            } catch (IOException | ServletException e) {
-                throw new RuntimeException(e);
-            }
-        }, Duration.ofSeconds(5)).join(); // block cho đến khi task chạy xong
+        try {
+            throttlingService.consume(() -> {
+                try {
+                    filterChain.doFilter(request, response);
+                } catch (IOException | ServletException e) {
+                    throw new RuntimeException(e);
+                }
+            }, Duration.ofSeconds(5)).join(); // block cho đến khi task chạy xong
+        } catch (Exception e) {
+            handlerExceptionResolver.resolveException(request, response, null, e);
+        }
     }
 }

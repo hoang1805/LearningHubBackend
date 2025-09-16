@@ -1,4 +1,4 @@
-package com.example.learninghubbackend.configs;
+package com.example.learninghubbackend.configs.securities;
 
 import com.example.learninghubbackend.commons.PropertiesData;
 import com.example.learninghubbackend.configs.filters.JwtFilter;
@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.NullSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -25,6 +24,10 @@ public class SecurityConfig {
     private final PropertiesData propertiesData;
     private final JwtFilter jwtFilter;
     private final ThrottlingFilter throttlingFilter;
+
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(getCorsConfigurationSource()))
@@ -32,6 +35,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/public/**").permitAll()
                         .anyRequest().authenticated())
+                .exceptionHandling(e -> e.accessDeniedHandler(customAccessDeniedHandler).authenticationEntryPoint(customAuthenticationEntryPoint))
                 .securityContext(securityContext -> securityContext.securityContextRepository(new NullSecurityContextRepository()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable);

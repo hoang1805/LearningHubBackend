@@ -20,9 +20,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
-import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -30,34 +30,40 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final SessionService sessionService;
     private final UserService userService;
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        Cookie accessToken = CookieUtil.getCookie(request, "access_token");
-        String accessTokenValue = accessToken != null ? accessToken.getValue() : null;
-        if (accessTokenValue == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        try {
+            Cookie accessToken = CookieUtil.getCookie(request, "access_token");
+            String accessTokenValue = accessToken != null ? accessToken.getValue() : null;
+            if (accessTokenValue == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-        JwtPayload payload = jwtService.validateToken(accessTokenValue);
-        ClientInfo clientInfo = ClientInfo.getClientInfo(request);
-        Session session = sessionService.query().getSession(payload.getSessionId());
-        boolean active = false;
-        if (session != null && session.getUserId().equals(payload.getUserId()) && !session.isRevoked()) {
-            active = verifyClient(clientInfo, session);
-        }
+            JwtPayload payload = jwtService.validateToken(accessTokenValue);
+            ClientInfo clientInfo = ClientInfo.getClientInfo(request);
+            Session session = sessionService.query().getSession(payload.getSessionId());
+            boolean active = false;
+            if (session != null && session.getUserId().equals(payload.getUserId()) && !session.isRevoked()) {
+                active = verifyClient(clientInfo, session);
+            }
 
-        if (active) {
-            User user = userService.query().getUser(payload.getUserId());
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(session.getUserId(), null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } else {
+            if (active) {
+                User user = userService.query().getUser(payload.getUserId());
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(session.getUserId(), null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else {
+                SecurityContextHolder.clearContext();
+//                throw new InvalidJwtToken();
+            }
+        } catch (Exception e) {
             SecurityContextHolder.clearContext();
-            throw new InvalidJwtToken();
+//            handlerExceptionResolver.resolveException(request, response, null, e);
+        } finally {
+            filterChain.doFilter(request, response);
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private boolean verifyClient(@NonNull ClientInfo clientInfo, @NonNull Session session) {
