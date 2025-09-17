@@ -3,10 +3,7 @@ package com.example.learninghubbackend.controllers;
 import com.example.learninghubbackend.commons.exceptions.CustomException;
 import com.example.learninghubbackend.commons.exceptions.NotFoundException;
 import com.example.learninghubbackend.commons.exceptions.NotHavePermission;
-import com.example.learninghubbackend.dtos.requests.group.CreateGroupRequest;
-import com.example.learninghubbackend.dtos.requests.group.JoinRequest;
-import com.example.learninghubbackend.dtos.requests.group.KickRequest;
-import com.example.learninghubbackend.dtos.requests.group.RejectRequest;
+import com.example.learninghubbackend.dtos.requests.group.*;
 import com.example.learninghubbackend.dtos.responses.BaseResponse;
 import com.example.learninghubbackend.models.group.Group;
 import com.example.learninghubbackend.models.group.GroupRequest;
@@ -20,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "api/group")
+@RequestMapping(path = "api/group/v1")
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
@@ -166,6 +163,40 @@ public class GroupController {
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success()
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateGroup(@PathVariable("id") Long id, @RequestBody ChangeInformationRequest request) {
+        Group group = groupService.query().getById(id);
+        if (group == null) {
+            throw new NotFoundException("Group not found");
+        }
+
+        if (!groupACL.canEdit(group)) {
+            throw new NotHavePermission("update the group");
+        }
+
+        groupService.updateGroup(group, request);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(group.release())
+        );
+    }
+
+    @PutMapping("/{id}/scope")
+    public ResponseEntity<Object> changeScope(@PathVariable("id") Long id, ChangeScopeRequest request) {
+        Group group = groupService.query().getById(id);
+        if (group == null) {
+            throw new NotFoundException("Group not found");
+        }
+
+        if (!groupACL.canEdit(group)) {
+            throw new NotHavePermission("update the group");
+        }
+
+        groupService.updateGroup(group, request);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(group.release())
         );
     }
 }

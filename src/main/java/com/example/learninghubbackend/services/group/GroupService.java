@@ -4,9 +4,7 @@ import com.example.learninghubbackend.commons.PropertiesData;
 import com.example.learninghubbackend.commons.exceptions.*;
 import com.example.learninghubbackend.commons.exceptions.group.AlreadyIn;
 import com.example.learninghubbackend.commons.exceptions.group.GroupReachLimit;
-import com.example.learninghubbackend.dtos.requests.group.CreateGroupRequest;
-import com.example.learninghubbackend.dtos.requests.group.JoinRequest;
-import com.example.learninghubbackend.dtos.requests.group.RejectRequest;
+import com.example.learninghubbackend.dtos.requests.group.*;
 import com.example.learninghubbackend.models.group.Group;
 import com.example.learninghubbackend.models.group.GroupMember;
 import com.example.learninghubbackend.models.group.GroupRequest;
@@ -16,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class GroupService {
@@ -23,7 +23,7 @@ public class GroupService {
     private final GroupListener listener;
     private final GroupReader reader;
     private final PropertiesData propertiesData;
-    private final GroupRequestService gs;
+    private final GroupRequestService gr;
     private final GroupMemberService gm;
 
     public GroupQuery query() {
@@ -53,6 +53,30 @@ public class GroupService {
         listener.onCreated(group);
 
         return group;
+    }
+
+    public void updateGroup(Group group, ChangeInformationRequest request) {
+        reader.read(group, request);
+        query.save(group);
+    }
+
+    @Transactional
+    public void updateGroup(Group group, ChangeScopeRequest request) {
+        boolean hasChange = reader.read(group, request);
+        query.save(group);
+        if (!hasChange) {
+            return;
+        }
+
+        List<GroupRequest> requests = gr.getByGroup(group.getId());
+
+        if (group.getScope().equals(Scope.PUBLIC)) {
+            approveRequests(requests, group);
+        }
+
+        if (group.getScope().equals(Scope.PRIVATE)) {
+            rejectRequests(requests, group, new RejectRequest("The group is private."));
+        }
     }
 
     @Transactional
@@ -89,13 +113,18 @@ public class GroupService {
         }
 
         // RegistrationPolicy.REQUEST_APPROVAL
-        GroupRequest groupRequest = gs.createGroupRequest(userId, request);
+        GroupRequest groupRequest = gr.createGroupRequest(userId, request);
     }
 
     @Transactional
     public void approveRequest(GroupRequest request, Group group) {
+        approveRequest(request, group, true);
+    }
+
+    @Transactional
+    public void approveRequest(GroupRequest request, Group group, boolean saved) {
         if (request.getMembershipType() != MembershipType.SPECTATOR
-        && request.getMembershipType() != MembershipType.PARTICIPANT) {
+                && request.getMembershipType() != MembershipType.PARTICIPANT) {
             throw new InvalidField("membership_type");
         }
 
@@ -108,7 +137,9 @@ public class GroupService {
         }
 
         group.addMember(request.getUserId());
-        query.save(group);
+        if (saved) {
+            query.save(group);
+        }
 
         listener.onApproved(group, request);
     }
@@ -161,5 +192,26 @@ public class GroupService {
         query.save(group);
 
         listener.onKicked(group, targetId, sourceId);
+    }
+
+    @Transactional
+    public void approveRequests(List<GroupRequest> groupRequests, Group group) {
+        for (GroupRequest groupRequest : groupRequests) {
+            try {
+                approveRequest(groupRequest, group, false);
+            }
+            catch (GroupReachLimit e) {
+                rejectRequest(group, groupRequest, new RejectRequest(e.getMessage()));
+            }
+        }
+
+        query.save(group);
+    }
+
+    @Transactional
+    public void rejectRequests(List<GroupRequest> groupRequests, Group group, RejectRequest request) {
+        for (GroupRequest groupRequest : groupRequests) {
+            rejectRequest(group, groupRequest, request);
+        }
     }
 }

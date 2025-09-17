@@ -6,6 +6,8 @@ import com.example.learninghubbackend.repositories.group.GroupRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class GroupRequestService {
@@ -27,6 +29,10 @@ public class GroupRequestService {
         groupRequest.setMessage(request.getMessage());
 
         return groupRequestRepository.save(groupRequest);
+    }
+
+    public List<GroupRequest> getByGroup(Long groupId) {
+        return groupRequestRepository.findByGroupId(groupId);
     }
 
     public GroupRequest getById(Long id) {

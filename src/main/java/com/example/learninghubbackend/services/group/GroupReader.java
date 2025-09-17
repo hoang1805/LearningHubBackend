@@ -1,9 +1,12 @@
 package com.example.learninghubbackend.services.group;
 
 import com.example.learninghubbackend.commons.exceptions.InvalidField;
+import com.example.learninghubbackend.dtos.requests.group.ChangeInformationRequest;
+import com.example.learninghubbackend.dtos.requests.group.ChangeScopeRequest;
 import com.example.learninghubbackend.dtos.requests.group.CreateGroupRequest;
 import com.example.learninghubbackend.models.group.Group;
 import com.example.learninghubbackend.utils.ReaderUtil;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +16,24 @@ public class GroupReader {
         readDescription(group, request.getDescription());
         readScope(group, request.getScope());
         readRegistrationPolicy(group, request.getRegistrationPolicy());
+    }
+
+    public void read(Group group, ChangeInformationRequest request) {
+        readName(group, request.getName());
+        readDescription(group, request.getDescription());
+    }
+
+    public boolean read(@NonNull Group group, @NonNull ChangeScopeRequest request) {
+        if (request.getScope() == null || request.getRegistrationPolicy() == null) {
+            throw new InvalidField("scope or registration policy", "Scope or registration policy cannot be null");
+        }
+
+        boolean hasChange = !group.getScope().equals(request.getScope());
+
+        readScope(group, request.getScope());
+        readRegistrationPolicy(group, request.getRegistrationPolicy());
+
+        return hasChange;
     }
 
     private void readName(Group group, String name) {
@@ -47,7 +68,7 @@ public class GroupReader {
                 throw new InvalidField("registration_policy");
             }
 
-            group.setRegistrationPolicy(RegistrationPolicy.REQUEST_APPROVAL);
+            group.setRegistrationPolicy(registrationPolicy);
         }
     }
 }
