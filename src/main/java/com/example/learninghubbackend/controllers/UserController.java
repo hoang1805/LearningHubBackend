@@ -1,6 +1,7 @@
 package com.example.learninghubbackend.controllers;
 
 import com.example.learninghubbackend.commons.exceptions.NotFoundException;
+import com.example.learninghubbackend.dtos.requests.user.ChangeInformation;
 import com.example.learninghubbackend.dtos.requests.user.ChangePasswordRequest;
 import com.example.learninghubbackend.dtos.responses.BaseResponse;
 import com.example.learninghubbackend.models.User;
@@ -45,6 +46,20 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success()
+        );
+    }
+
+    @PutMapping("change/information")
+    public ResponseEntity<Object> changeInformation(@RequestBody ChangeInformation changeInformation) {
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.query().getUser(userId);
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+
+        userService.reader().changeInformation(user, changeInformation);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(user.release())
         );
     }
 }
