@@ -49,7 +49,7 @@ public class UserController {
         );
     }
 
-    @PutMapping("change/information")
+    @PutMapping("/change/information")
     public ResponseEntity<Object> changeInformation(@RequestBody ChangeInformation changeInformation) {
         Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userService.query().getUser(userId);
