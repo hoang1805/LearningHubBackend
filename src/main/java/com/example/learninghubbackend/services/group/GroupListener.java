@@ -35,4 +35,8 @@ public class GroupListener {
     public void onQuited(Group group, Long userId) {
         gs.remove(group.getId(), userId);
     }
+
+    public void onKicked(Group group, Long sourceUserId, Long targetUserId) {
+        gs.remove(group.getId(), targetUserId);
+    }
 }

@@ -1,7 +1,7 @@
 package com.example.learninghubbackend.services.group;
 
 public enum MembershipType {
-    CREATOR, MANAGER, PARTICIPANT, SPECTATOR;
+    SPECTATOR, PARTICIPANT, MANAGER, CREATOR ;
 
     public static MembershipType fromString(String type) {
         try {

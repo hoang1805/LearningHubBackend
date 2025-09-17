@@ -14,4 +14,6 @@ public interface IGroupACL extends IBaseACL<Group> {
     boolean canApprove(Group group);
 
     boolean canQuit(Group group);
+
+    boolean canKick(Group group);
 }

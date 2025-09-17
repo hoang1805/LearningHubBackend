@@ -60,6 +60,17 @@ public class GroupACL implements IGroupACL {
     }
 
     @Override
+    public boolean canKick(Group group) {
+        Long userId = appContext.getUserId();
+        GroupMember member = gm.getGroupMember(userId, group.getId());
+        if (member == null) {
+            return false;
+        }
+
+        return member.isCreator() || member.isManager();
+    }
+
+    @Override
     public boolean canCreate() {
         return true;
     }

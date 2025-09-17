@@ -8,7 +8,9 @@ import com.example.learninghubbackend.dtos.requests.group.CreateGroupRequest;
 import com.example.learninghubbackend.dtos.requests.group.JoinRequest;
 import com.example.learninghubbackend.dtos.requests.group.RejectRequest;
 import com.example.learninghubbackend.models.group.Group;
+import com.example.learninghubbackend.models.group.GroupMember;
 import com.example.learninghubbackend.models.group.GroupRequest;
+import com.example.learninghubbackend.services.group.member.GroupMemberService;
 import com.example.learninghubbackend.services.group.request.GroupRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class GroupService {
     private final GroupReader reader;
     private final PropertiesData propertiesData;
     private final GroupRequestService gs;
+    private final GroupMemberService gm;
 
     public GroupQuery query() {
         return query;
@@ -115,6 +118,7 @@ public class GroupService {
         listener.onRejected(group, groupRequest, request);
     }
 
+    @Transactional
     public void quit(Group group, Long userId) {
         if (group.getCreatorId().equals(userId)) {
             throw new BadRequest("You cannot quit this group because you are creator.");
@@ -124,5 +128,38 @@ public class GroupService {
         query.save(group);
 
         listener.onQuited(group, userId);
+    }
+
+    /**
+     * Kick a member out of a group.
+     *
+     * @param group target group
+     * @param sourceId user will kick
+     * @param targetId user to be kicked
+     */
+    @Transactional
+    public void kick(Group group, Long sourceId, Long targetId) {
+        if (sourceId.equals(targetId)) {
+            throw new BadRequest("You cannot kick this group because you are source.");
+        }
+
+        if (group.getCreatorId().equals(targetId)) {
+            throw new BadRequest("You cannot kick this person because you are creator.");
+        }
+
+        GroupMember source = gm.getGroupMember(sourceId, group.getId());
+        GroupMember target = gm.getGroupMember(targetId, group.getId());
+        if (source == null || target == null) {
+            throw new NotFoundException("Group member not found.");
+        }
+
+        if (source.getMembershipType().compareTo(target.getMembershipType()) <= 0) {
+            throw new NotHavePermission("kick this person");
+        }
+
+        group.removeMember(targetId);
+        query.save(group);
+
+        listener.onKicked(group, targetId, sourceId);
     }
 }

@@ -5,6 +5,7 @@ import com.example.learninghubbackend.commons.exceptions.NotFoundException;
 import com.example.learninghubbackend.commons.exceptions.NotHavePermission;
 import com.example.learninghubbackend.dtos.requests.group.CreateGroupRequest;
 import com.example.learninghubbackend.dtos.requests.group.JoinRequest;
+import com.example.learninghubbackend.dtos.requests.group.KickRequest;
 import com.example.learninghubbackend.dtos.requests.group.RejectRequest;
 import com.example.learninghubbackend.dtos.responses.BaseResponse;
 import com.example.learninghubbackend.models.group.Group;
@@ -143,6 +144,25 @@ public class GroupController {
         }
 
         groupService.quit(group, userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success()
+        );
+    }
+
+    @PostMapping("/{id}/kick")
+    public ResponseEntity<Object> kickGroup(@PathVariable("id") Long id, @RequestBody KickRequest request) {
+        Long userId = appContext.getUserId();
+        Group group = groupService.query().getById(id);
+        if (group == null) {
+            throw new NotFoundException("Group not found");
+        }
+
+        if (!groupACL.canKick(group)) {
+            throw new NotHavePermission("kick the group");
+        }
+
+        groupService.kick(group, userId, request.getKickedUserId());
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success()
