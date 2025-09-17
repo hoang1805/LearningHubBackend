@@ -1,8 +1,10 @@
 package com.example.learninghubbackend.controllers;
 
+import com.example.learninghubbackend.commons.exceptions.CustomException;
 import com.example.learninghubbackend.commons.exceptions.NotFoundException;
 import com.example.learninghubbackend.commons.exceptions.NotHavePermission;
 import com.example.learninghubbackend.dtos.requests.group.CreateGroupRequest;
+import com.example.learninghubbackend.dtos.requests.group.JoinRequest;
 import com.example.learninghubbackend.dtos.responses.BaseResponse;
 import com.example.learninghubbackend.models.group.Group;
 import com.example.learninghubbackend.services.AppContext;
@@ -49,6 +51,28 @@ public class GroupController {
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success(group.release())
+        );
+    }
+
+    @PostMapping("/join")
+    public ResponseEntity<Object> joinGroup(@RequestBody JoinRequest request) {
+        Group group = groupService.query().getById(request.getGroupId());
+        if (group == null) {
+            throw new NotFoundException("Group not found");
+        }
+
+        if (!groupACL.canJoin(group)) {
+            throw new NotHavePermission("join the group");
+        }
+
+        Long userId = appContext.getUserId();
+        if (group.haveMember(userId)) {
+            throw new CustomException("You have already been in this group", HttpStatus.BAD_REQUEST.value());
+        }
+
+        groupService.joinGroup(userId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success()
         );
     }
 }

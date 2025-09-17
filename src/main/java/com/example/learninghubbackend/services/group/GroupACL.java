@@ -35,12 +35,7 @@ public class GroupACL implements IGroupACL {
 
     @Override
     public boolean canJoin(Group group) {
-        if (group.getScope() == Scope.PRIVATE) {
-            return false;
-        }
-
-        Long userId = appContext.getUserId();
-        return !group.haveMember(userId);
+        return group.getScope() != Scope.PRIVATE;
     }
 
     @Override

@@ -14,4 +14,8 @@ public class GroupListener {
     public void onCreated(Group group) {
         gm.createGroupMember(group.getCreatorId(), group.getId(), MembershipType.CREATOR);
     }
+
+    public void onJoined(Group group, Long userId, MembershipType membershipType) {
+        gm.createGroupMember(group.getId(), userId, membershipType);
+    }
 }

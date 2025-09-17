@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class GroupQuery {
     private final GroupRepository groupRepository;
 
-    public Group save(Group group) {
-        return groupRepository.save(group);
+    public void save(Group group) {
+        groupRepository.save(group);
     }
 
     public Group getById(Long id) {
