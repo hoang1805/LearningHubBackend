@@ -18,9 +18,7 @@ import org.springframework.stereotype.Component;
 public class UserReader {
     private final UserQuery userQuery;
 
-    public User createUser(RegisterRequest request) {
-        User user = new User();
-
+    public void readUser(User user, RegisterRequest request) {
         readUsername(user, request.username);
         readPassword(user, request.password);
         readEmail(user, request.email);
@@ -28,11 +26,9 @@ public class UserReader {
         readName(user, request.name);
         readRole(user, request.role);
         readGender(user, request.gender);
-
-        return userQuery.save(user);
     }
 
-    public void changePassword(User user, ChangePasswordRequest request) {
+    public void readChangePassword(User user, ChangePasswordRequest request) {
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new PasswordNotMatch("New password");
         }
@@ -50,10 +46,9 @@ public class UserReader {
         }
 
         readPassword(user, request.getNewPassword());
-        userQuery.save(user);
     }
 
-    public void changeInformation(User user, ChangeInformation changeInformation) {
+    public void readInformation(User user, ChangeInformation changeInformation) {
         if (changeInformation.getName() != null) {
             readName(user, changeInformation.getName());
         }
@@ -69,8 +64,6 @@ public class UserReader {
         if (changeInformation.getEmail() != null) {
             readEmail(user, changeInformation.getEmail());
         }
-
-        userQuery.save(user);
     }
 
     private void readUsername(User user, String username) {

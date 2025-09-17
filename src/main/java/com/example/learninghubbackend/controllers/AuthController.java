@@ -51,7 +51,7 @@ public class AuthController {
             throw new PasswordNotMatch();
         }
 
-        User user = userService.reader().createUser(request);
+        User user = userService.createUser(request);
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.success());
     }
