@@ -7,6 +7,10 @@ public enum Gender {
 
     @JsonCreator
     public static Gender fromString(String gender) {
+        if (gender == null) {
+            return null;
+        }
+
         try {
             return valueOf(gender.toUpperCase());
         } catch (Exception e) {

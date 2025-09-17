@@ -24,6 +24,10 @@ public class SessionQuery {
         sessionRepository.saveAll(sessions);
     }
 
+    public List<Session> getSessionsByUserId(Long userId) {
+        return sessionRepository.findAllByUserIdAndRevokedFalse(userId);
+    }
+
     public void revoke(Long sessionId) {
         Session session = getSession(sessionId);
         if (session == null) {
@@ -36,5 +40,9 @@ public class SessionQuery {
 
     public Session save(Session session) {
         return sessionRepository.save(session);
+    }
+
+    public List<Session> saveAll(List<Session> sessions) {
+        return sessionRepository.saveAll(sessions);
     }
 }
