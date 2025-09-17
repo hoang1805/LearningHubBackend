@@ -24,11 +24,16 @@ public class GroupRequestService {
         groupRequest.setUserId(userId);
         groupRequest.setMembershipType(request.getMembershipType());
         groupRequest.setGroupId(request.getGroupId());
+        groupRequest.setMessage(request.getMessage());
 
         return groupRequestRepository.save(groupRequest);
     }
 
     public GroupRequest getById(Long id) {
         return groupRequestRepository.findById(id).orElse(null);
+    }
+
+    public void remove(GroupRequest groupRequest) {
+        groupRequestRepository.delete(groupRequest);
     }
 }

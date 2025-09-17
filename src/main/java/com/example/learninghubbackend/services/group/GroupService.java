@@ -1,12 +1,12 @@
 package com.example.learninghubbackend.services.group;
 
 import com.example.learninghubbackend.commons.PropertiesData;
-import com.example.learninghubbackend.commons.exceptions.AlreadyExists;
-import com.example.learninghubbackend.commons.exceptions.CustomException;
-import com.example.learninghubbackend.commons.exceptions.InvalidField;
-import com.example.learninghubbackend.commons.exceptions.NotFoundException;
+import com.example.learninghubbackend.commons.exceptions.*;
+import com.example.learninghubbackend.commons.exceptions.group.AlreadyIn;
+import com.example.learninghubbackend.commons.exceptions.group.GroupReachLimit;
 import com.example.learninghubbackend.dtos.requests.group.CreateGroupRequest;
 import com.example.learninghubbackend.dtos.requests.group.JoinRequest;
+import com.example.learninghubbackend.dtos.requests.group.RejectRequest;
 import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.models.group.Group;
 import com.example.learninghubbackend.models.group.GroupRequest;
@@ -71,11 +71,11 @@ public class GroupService {
         }
 
         if (group.haveMember(userId)) {
-            throw new CustomException("You have already in this group.", HttpStatus.BAD_REQUEST.value());
+            throw new AlreadyIn();
         }
 
         if (group.getMembers().size() >= group.getMaxMember()) {
-            throw new CustomException("You can not join this group because it reaches the limit members.", HttpStatus.BAD_REQUEST.value());
+            throw new GroupReachLimit();
         }
 
         // RegistrationPolicy.OPEN
@@ -89,5 +89,31 @@ public class GroupService {
 
         // RegistrationPolicy.REQUEST_APPROVAL
         GroupRequest groupRequest = gs.createGroupRequest(userId, request);
+    }
+
+    @Transactional
+    public void approveRequest(GroupRequest request, Group group) {
+        if (request.getMembershipType() != MembershipType.SPECTATOR
+        && request.getMembershipType() != MembershipType.PARTICIPANT) {
+            throw new InvalidField("membership_type");
+        }
+
+        if (group.getScope() == Scope.PRIVATE) {
+            throw new NotApprove("request");
+        }
+
+        if (group.haveMember(request.getUserId())) {
+            throw new AlreadyIn();
+        }
+
+        group.addMember(request.getUserId());
+        query.save(group);
+
+        listener.onApproved(group, request);
+    }
+
+    @Transactional
+    public void rejectRequest(Group group, GroupRequest groupRequest, RejectRequest request) {
+        listener.onRejected(group, groupRequest, request);
     }
 }

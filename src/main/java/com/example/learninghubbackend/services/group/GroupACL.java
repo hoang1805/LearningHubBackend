@@ -40,7 +40,17 @@ public class GroupACL implements IGroupACL {
 
     @Override
     public boolean canApprove(Group group) {
-        return false;
+        if (group.getScope() == Scope.PRIVATE) {
+            return false;
+        }
+
+        Long userId = appContext.getUserId();
+        GroupMember member = gm.getGroupMember(userId, group.getId());
+        if (member == null) {
+            return false;
+        }
+
+        return member.isCreator() || member.isManager();
     }
 
     @Override

@@ -15,4 +15,6 @@ public class JoinRequest {
 
     @JsonProperty("membership_type")
     private MembershipType membershipType;
+
+    private String message;
 }
