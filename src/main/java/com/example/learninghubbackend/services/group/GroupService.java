@@ -7,12 +7,10 @@ import com.example.learninghubbackend.commons.exceptions.group.GroupReachLimit;
 import com.example.learninghubbackend.dtos.requests.group.CreateGroupRequest;
 import com.example.learninghubbackend.dtos.requests.group.JoinRequest;
 import com.example.learninghubbackend.dtos.requests.group.RejectRequest;
-import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.models.group.Group;
 import com.example.learninghubbackend.models.group.GroupRequest;
 import com.example.learninghubbackend.services.group.request.GroupRequestService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,5 +113,16 @@ public class GroupService {
     @Transactional
     public void rejectRequest(Group group, GroupRequest groupRequest, RejectRequest request) {
         listener.onRejected(group, groupRequest, request);
+    }
+
+    public void quit(Group group, Long userId) {
+        if (group.getCreatorId().equals(userId)) {
+            throw new BadRequest("You cannot quit this group because you are creator.");
+        }
+
+        group.removeMember(userId);
+        query.save(group);
+
+        listener.onQuited(group, userId);
     }
 }

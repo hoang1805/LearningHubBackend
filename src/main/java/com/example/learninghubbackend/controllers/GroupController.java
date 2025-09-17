@@ -129,4 +129,23 @@ public class GroupController {
                 BaseResponse.success()
         );
     }
+
+    @PostMapping("/{id}/quit")
+    public ResponseEntity<Object> quitGroup(@PathVariable("id") Long id) {
+        Long userId = appContext.getUserId();
+        Group group = groupService.query().getById(id);
+        if (group == null) {
+            throw new NotFoundException("Group not found");
+        }
+
+        if (!groupACL.canQuit(group)) {
+            throw new NotHavePermission("quit the group");
+        }
+
+        groupService.quit(group, userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success()
+        );
+    }
 }

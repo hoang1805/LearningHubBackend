@@ -31,4 +31,8 @@ public class GroupListener {
     public void onRejected(Group group, GroupRequest groupRequest, RejectRequest rejectRequest) {
         gs.remove(groupRequest);
     }
+
+    public void onQuited(Group group, Long userId) {
+        gs.remove(group.getId(), userId);
+    }
 }

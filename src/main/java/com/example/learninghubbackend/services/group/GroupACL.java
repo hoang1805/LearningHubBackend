@@ -54,6 +54,12 @@ public class GroupACL implements IGroupACL {
     }
 
     @Override
+    public boolean canQuit(Group group) {
+        Long userId = appContext.getUserId();
+        return group.haveMember(userId);
+    }
+
+    @Override
     public boolean canCreate() {
         return true;
     }

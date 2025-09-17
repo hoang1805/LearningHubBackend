@@ -36,4 +36,13 @@ public class GroupRequestService {
     public void remove(GroupRequest groupRequest) {
         groupRequestRepository.delete(groupRequest);
     }
+
+    public void remove(Long groupId, Long userId) {
+        GroupRequest groupRequest = getById(groupId);
+        if (groupRequest == null) {
+            return;
+        }
+
+        groupRequestRepository.delete(groupRequest);
+    }
 }
