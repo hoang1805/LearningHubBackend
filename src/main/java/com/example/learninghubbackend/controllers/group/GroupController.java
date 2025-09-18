@@ -163,4 +163,31 @@ public class GroupController {
                 BaseResponse.success()
         );
     }
+
+    @GetMapping("/token/{token}")
+    public ResponseEntity<Object> getGroupByToken(@PathVariable("token") String token) {
+        Group group = groupService.getByToken(token);
+        if (group == null) {
+            throw new NotFoundException("Group not found");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(group.release())
+        );
+    }
+
+    @PostMapping("/join/token")
+    public ResponseEntity<Object> joinByToken(@RequestBody JoinByToken request) {
+        Group group = groupService.query().getById(request.getGroupId());
+        if (group == null) {
+            throw new NotFoundException("Group not found");
+        }
+
+        Long userId = appContext.getUserId();
+
+        groupService.joinGroup(group, userId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success()
+        );
+    }
 }
