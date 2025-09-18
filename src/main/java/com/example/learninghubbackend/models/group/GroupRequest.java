@@ -18,13 +18,15 @@ public class GroupRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "group_id", nullable = false)
     private Long groupId;
 
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     private String message;
 
-    @Column(name = "membership_type")
+    @Column(name = "membership_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private MembershipType membershipType;
 }

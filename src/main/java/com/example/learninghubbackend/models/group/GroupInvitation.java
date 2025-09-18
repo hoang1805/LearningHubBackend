@@ -20,13 +20,16 @@ public class GroupInvitation extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "group_id", nullable = false)
     private Long groupId;
 
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Column(name = "invitor_id", nullable = false)
     private Long invitorId;
 
-    @Column(name = "membership_type")
+    @Column(name = "membership_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private MembershipType membershipType;
 

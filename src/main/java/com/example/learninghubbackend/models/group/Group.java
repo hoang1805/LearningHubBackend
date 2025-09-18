@@ -28,25 +28,27 @@ public class Group extends BaseModel implements Releasable<GroupRelease, GroupRe
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
     private String description;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     @Convert(converter = ListLongConverter.class)
     private List<Long> members;
 
-    @Column(name = "max_member")
+    @Column(name = "max_member", nullable = false)
     private Integer maxMember;
 
-    @Column(name = "registration_policy")
+    @Column(name = "registration_policy", nullable = false)
     @Enumerated(EnumType.STRING)
     private RegistrationPolicy registrationPolicy;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Scope scope;
 
-    @Column(name = "creator_id")
+    @Column(name = "creator_id", nullable = false)
     private Long creatorId;
 
     public boolean haveMember(Long userId) {

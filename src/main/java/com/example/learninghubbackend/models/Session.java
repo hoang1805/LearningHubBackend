@@ -18,9 +18,10 @@ public class Session extends BaseModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Column(nullable = false)
     private boolean revoked;
 
     private String device;
@@ -29,7 +30,7 @@ public class Session extends BaseModel {
 
     private String browser;
 
-    @Column(name = "ip_address")
+    @Column(name = "ip_address", nullable = false)
     private String ipAddress;
 
     public Session(Long id, Long userId, boolean revoked, String device, String os, String browser, String ipAddress, Long createdAt, Long updatedAt) {
