@@ -24,6 +24,8 @@ public class GroupInvitation extends BaseModel {
 
     private Long userId;
 
+    private Long invitorId;
+
     @Column(name = "membership_type")
     @Enumerated(EnumType.STRING)
     private MembershipType membershipType;

@@ -8,6 +8,7 @@ import com.example.learninghubbackend.dtos.requests.group.*;
 import com.example.learninghubbackend.models.group.Group;
 import com.example.learninghubbackend.models.group.GroupMember;
 import com.example.learninghubbackend.models.group.GroupRequest;
+import com.example.learninghubbackend.services.group.invitation.GroupInvitationService;
 import com.example.learninghubbackend.services.group.member.GroupMemberService;
 import com.example.learninghubbackend.services.group.request.GroupRequestService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class GroupService {
     private final PropertiesData propertiesData;
     private final GroupRequestService gr;
     private final GroupMemberService gm;
+    private final GroupInvitationService gi;
 
     public GroupQuery query() {
         return query;
@@ -72,6 +74,9 @@ public class GroupService {
 
         if (group.getScope().equals(Scope.PUBLIC)) {
             approveRequests(requests, group);
+            if (group.getRegistrationPolicy() == RegistrationPolicy.REQUEST_APPROVAL) {
+                removeInvitations(group);
+            }
         }
 
         if (group.getScope().equals(Scope.PRIVATE)) {
@@ -213,5 +218,28 @@ public class GroupService {
         for (GroupRequest groupRequest : groupRequests) {
             rejectRequest(group, groupRequest, request);
         }
+    }
+
+    @Transactional
+    public void removeInvitations(Group group) {
+        gi.deleteByGroup(group);
+    }
+
+    public void invite(Group group, Long invitorId, InviteRequest request) {
+        if (request.getMembershipType() != MembershipType.SPECTATOR
+                && request.getMembershipType() != MembershipType.PARTICIPANT) {
+            throw new InvalidField("membership_type");
+        }
+
+        if(group.haveMember(request.getInvitedUserId())) {
+            throw new AlreadyIn();
+        }
+
+        GroupMember invitor = gm.getGroupMember(invitorId, group.getId());
+        if (invitor == null) {
+            throw new NotFoundException("Group member not found.");
+        }
+
+        gi.createGroupInvitation(group, invitorId, request);
     }
 }

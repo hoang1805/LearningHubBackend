@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GroupInvitationRepository extends JpaRepository<GroupInvitation, Long> {
+    void deleteByGroupId(Long id);
 }

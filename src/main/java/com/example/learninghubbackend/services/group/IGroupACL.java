@@ -5,7 +5,7 @@ import com.example.learninghubbackend.models.User;
 import com.example.learninghubbackend.models.group.Group;
 
 public interface IGroupACL extends IBaseACL<Group> {
-    boolean canChangeType(User user, Group group);
+    boolean canCreateCode(User user, Group group);
 
     boolean canInvite(Group group);
 

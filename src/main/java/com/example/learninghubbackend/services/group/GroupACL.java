@@ -18,12 +18,16 @@ public class GroupACL implements IGroupACL {
     private final AppContext appContext;
 
     @Override
-    public boolean canChangeType(User user, Group group) {
+    public boolean canCreateCode(User user, Group group) {
         return false;
     }
 
     @Override
     public boolean canInvite(Group group) {
+        if (group.getRegistrationPolicy() == RegistrationPolicy.REQUEST_APPROVAL) {
+            return false;
+        }
+
         Long userId = appContext.getUserId();
         GroupMember member = gm.getGroupMember(userId, group.getId());
         if (member == null) {
