@@ -10,7 +10,7 @@ public class ReaderUtil {
     }
 
     public static boolean isValidString(String s, String regex) {
-        if (s == null || s.isEmpty()) {
+        if (s == null || s.isBlank()) {
             return false;
         }
 

@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "api/user")
+@RequestMapping(path = "api/user/v1")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -42,7 +42,7 @@ public class UserController {
             throw new NotFoundException("User not found");
         }
 
-        userService.reader().changePassword(user, changePasswordRequest);
+        userService.changePassword(user, changePasswordRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success()
@@ -57,7 +57,7 @@ public class UserController {
             throw new NotFoundException("User not found");
         }
 
-        userService.reader().changeInformation(user, changeInformation);
+        userService.changeInformation(user, changeInformation);
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success(user.release())
         );

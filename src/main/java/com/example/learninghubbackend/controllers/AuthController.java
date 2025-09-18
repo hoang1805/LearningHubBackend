@@ -23,7 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "api/auth")
+@RequestMapping(path = "api/auth/v1")
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
@@ -51,7 +51,7 @@ public class AuthController {
             throw new PasswordNotMatch();
         }
 
-        User user = userService.reader().createUser(request);
+        User user = userService.createUser(request);
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.success());
     }
