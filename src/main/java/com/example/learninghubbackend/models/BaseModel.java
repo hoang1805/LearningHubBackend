@@ -10,10 +10,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class BaseModel {
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Long createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updatedAt", nullable = false)
     private Long updatedAt;
 
     public BaseModel() {
