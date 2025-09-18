@@ -26,4 +26,16 @@ public class GroupInvitationService {
 
         return groupInvitationRepository.save(invitation);
     }
+
+    public GroupInvitation getById(@NonNull Long invitationId) {
+        return groupInvitationRepository.findById(invitationId).orElse(null);
+    }
+
+    public void remove(@NonNull Long invitationId) {
+        groupInvitationRepository.deleteById(invitationId);
+    }
+
+    public void remove(@NonNull GroupInvitation invitation) {
+        groupInvitationRepository.delete(invitation);
+    }
 }

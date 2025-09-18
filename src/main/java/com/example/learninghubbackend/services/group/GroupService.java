@@ -6,11 +6,13 @@ import com.example.learninghubbackend.commons.exceptions.group.AlreadyIn;
 import com.example.learninghubbackend.commons.exceptions.group.GroupReachLimit;
 import com.example.learninghubbackend.dtos.requests.group.*;
 import com.example.learninghubbackend.models.group.Group;
+import com.example.learninghubbackend.models.group.GroupInvitation;
 import com.example.learninghubbackend.models.group.GroupMember;
 import com.example.learninghubbackend.models.group.GroupRequest;
 import com.example.learninghubbackend.services.group.invitation.GroupInvitationService;
 import com.example.learninghubbackend.services.group.member.GroupMemberService;
 import com.example.learninghubbackend.services.group.request.GroupRequestService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -141,6 +143,10 @@ public class GroupService {
             throw new AlreadyIn();
         }
 
+        if (group.getMembers().size() >= group.getMaxMember()) {
+            throw new GroupReachLimit();
+        }
+
         group.addMember(request.getUserId());
         if (saved) {
             query.save(group);
@@ -225,6 +231,7 @@ public class GroupService {
         gi.deleteByGroup(group);
     }
 
+    @Transactional
     public void invite(Group group, Long invitorId, InviteRequest request) {
         if (request.getMembershipType() != MembershipType.SPECTATOR
                 && request.getMembershipType() != MembershipType.PARTICIPANT) {
@@ -241,5 +248,29 @@ public class GroupService {
         }
 
         gi.createGroupInvitation(group, invitorId, request);
+    }
+
+    public void acceptInvitation(@NonNull Group group, @NonNull GroupInvitation invitation) {
+        if (group.haveMember(invitation.getUserId())) {
+            throw new AlreadyIn();
+        }
+
+        if (invitation.getMembershipType() != MembershipType.SPECTATOR
+                && invitation.getMembershipType() != MembershipType.PARTICIPANT) {
+            throw new InvalidField("membership_type");
+        }
+
+        if (group.getMembers().size() >= group.getMaxMember()) {
+            throw new GroupReachLimit();
+        }
+
+        group.addMember(invitation.getUserId());
+        query.save(group);
+
+        listener.onAcceptInvitation(group, invitation);
+    }
+
+    public void rejectInvitation(@NonNull Group group, @NonNull GroupInvitation invitation) {
+        listener.onRejectInvitation(group, invitation);
     }
 }

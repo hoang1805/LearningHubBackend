@@ -64,9 +64,8 @@ public class GroupRequestController {
             throw new NotFoundException("Group not found");
         }
 
-        Long userId = appContext.getUserId();
-        if (userId.equals(groupRequest.getUserId())) {
-            throw new CustomException("You have already been in this group", HttpStatus.BAD_REQUEST.value());
+        if (!groupACL.canApprove(group)) {
+            throw new NotHavePermission("approve the group");
         }
 
         groupService.rejectRequest(group, groupRequest, request);
