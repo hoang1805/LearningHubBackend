@@ -1,0 +1,20 @@
+package com.example.learninghubbackend.dtos.requests.group;
+
+import com.example.learninghubbackend.services.group.MembershipType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@AllArgsConstructor
+@Getter
+@Setter
+public class JoinByToken {
+    @JsonProperty("group_id")
+    private Long groupId;
+
+    @JsonProperty("membership_type")
+    private MembershipType membershipType;
+
+    private String token;
+}
