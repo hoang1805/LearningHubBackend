@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class GroupACL implements IGroupACL {
-    private final GroupService groupService;
     private final GroupMemberService gm;
     private final AppContext appContext;
 
