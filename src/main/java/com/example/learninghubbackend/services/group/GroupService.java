@@ -345,4 +345,13 @@ public class GroupService {
 
         return group;
     }
+
+    public boolean haveMember(Long groupId, Long memberId) {
+        Group group = query.getById(groupId);
+        if (group == null) {
+            return false;
+        }
+
+        return group.haveMember(memberId);
+    }
 }

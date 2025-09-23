@@ -1,6 +1,6 @@
 package com.example.learninghubbackend.dtos.responses.post;
 
-import com.example.learninghubbackend.services.post.vote.VoteType;
+import com.example.learninghubbackend.services.vote.VoteType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

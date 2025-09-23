@@ -1,7 +1,7 @@
-package com.example.learninghubbackend.services.post.vote;
+package com.example.learninghubbackend.services.vote;
 
 import com.example.learninghubbackend.commons.models.ObjectType;
-import com.example.learninghubbackend.models.post.Vote;
+import com.example.learninghubbackend.models.Vote;
 import com.example.learninghubbackend.repositories.post.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,9 +23,14 @@ public class VoteService {
         return voteRepository.save(vote);
     }
 
-    public void update(Vote vote, VoteType type) {
+    public boolean update(Vote vote, VoteType type) {
+        if (vote.getType() == type) {
+            return false;
+        }
+
         vote.setType(type);
         voteRepository.save(vote);
+        return true;
     }
 
     public void delete(Vote vote) {

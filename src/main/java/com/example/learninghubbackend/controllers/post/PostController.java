@@ -5,6 +5,7 @@ import com.example.learninghubbackend.commons.exceptions.NotHavePermission;
 import com.example.learninghubbackend.dtos.requests.post.CreateCommentRequest;
 import com.example.learninghubbackend.dtos.requests.post.CreateRequest;
 import com.example.learninghubbackend.dtos.requests.post.EditRequest;
+import com.example.learninghubbackend.dtos.requests.vote.VoteRequest;
 import com.example.learninghubbackend.dtos.responses.BaseResponse;
 import com.example.learninghubbackend.models.post.Comment;
 import com.example.learninghubbackend.models.post.Post;
@@ -64,9 +65,43 @@ public class PostController {
             throw new NotHavePermission("comment this post");
         }
 
-        Comment comment = postService.addComment(post, request, appContext.getUserId(), null);
+        Comment comment = postService.addComment(post, request, appContext.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 BaseResponse.success(comment.release())
+        );
+    }
+
+    @PostMapping("/{id}/vote")
+    public ResponseEntity<Object> vote(@PathVariable("id") Long id, @RequestBody VoteRequest request) {
+        Post post = postService.query().get(id);
+        if (post == null) {
+            throw new NotFoundException("Post not found");
+        }
+
+        if (!postACL.canVote(post)) {
+            throw new NotHavePermission("vote this post");
+        }
+
+        postService.vote(post, request, appContext.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(postService.release(post))
+        );
+    }
+
+    @PostMapping("/{id}/unvote")
+    public ResponseEntity<Object> unvote(@PathVariable("id") Long id) {
+        Post post = postService.query().get(id);
+        if (post == null) {
+            throw new NotFoundException("Post not found");
+        }
+
+        if (!postACL.canVote(post)) {
+            throw new NotHavePermission("unvote this post");
+        }
+
+        postService.unvote(post, appContext.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                BaseResponse.success(post.release())
         );
     }
 }

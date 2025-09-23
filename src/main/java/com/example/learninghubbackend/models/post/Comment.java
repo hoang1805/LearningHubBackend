@@ -7,7 +7,7 @@ import com.example.learninghubbackend.commons.models.Releasable;
 import com.example.learninghubbackend.dtos.responses.post.CommentRelease;
 import com.example.learninghubbackend.dtos.responses.post.CommentReleaseCompact;
 import com.example.learninghubbackend.models.BaseModel;
-import com.example.learninghubbackend.services.post.vote.VoteType;
+import com.example.learninghubbackend.services.vote.VoteType;
 import com.example.learninghubbackend.utils.TimerUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -102,6 +102,10 @@ public class Comment extends BaseModel implements Releasable<CommentRelease, Com
     }
 
     public void addVote(VoteType voteType) {
+        if (voteType == null) {
+            return ;
+        }
+
         if (voteType == VoteType.UP) {
             this.upVotes++;
         } else {
@@ -111,6 +115,10 @@ public class Comment extends BaseModel implements Releasable<CommentRelease, Com
     }
 
     public void removeVote(VoteType voteType) {
+        if (voteType == null) {
+            return ;
+        }
+
         if (voteType == VoteType.UP) {
             this.upVotes--;
         } else {

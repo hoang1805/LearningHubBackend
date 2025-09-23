@@ -1,8 +1,7 @@
-package com.example.learninghubbackend.models.post;
+package com.example.learninghubbackend.models;
 
 import com.example.learninghubbackend.commons.models.ObjectType;
-import com.example.learninghubbackend.models.BaseModel;
-import com.example.learninghubbackend.services.post.vote.VoteType;
+import com.example.learninghubbackend.services.vote.VoteType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +32,14 @@ public class Vote extends BaseModel {
 
     @Column(name = "object_id", nullable = false)
     private Long objectId;
+
+    public Vote(Long userId, ObjectType objectType, Long objectId) {
+        super();
+        this.type = null;
+        this.userId = userId;
+        this.objectType = objectType;
+        this.objectId = objectId;
+    }
 
     @Override
     public String getModelType() {

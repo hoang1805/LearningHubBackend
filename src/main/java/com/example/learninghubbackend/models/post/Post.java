@@ -6,7 +6,7 @@ import com.example.learninghubbackend.dtos.responses.post.PostRelease;
 import com.example.learninghubbackend.dtos.responses.post.PostReleaseCompact;
 import com.example.learninghubbackend.models.BaseModel;
 import com.example.learninghubbackend.services.post.Scope;
-import com.example.learninghubbackend.services.post.vote.VoteType;
+import com.example.learninghubbackend.services.vote.VoteType;
 import com.example.learninghubbackend.utils.TimerUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -53,12 +53,20 @@ public class Post extends BaseModel implements Releasable<PostRelease, PostRelea
     private Long groupId;
 
     public void addVote(VoteType type) {
+        if (type == null) {
+            return;
+        }
+
         upVotes += type == VoteType.UP ? 1 : 0;
         downVotes += type == VoteType.DOWN ? 1 : 0;
         calculateScore();
     }
 
     public void removeVote(VoteType type) {
+        if (type == null) {
+            return;
+        }
+
         downVotes -= type == VoteType.DOWN ? 1 : 0;
         upVotes -= type == VoteType.UP ? 1 : 0;
         calculateScore();
@@ -66,6 +74,11 @@ public class Post extends BaseModel implements Releasable<PostRelease, PostRelea
 
     public void addComments() {
         comments++;
+        calculateScore();
+    }
+
+    public void removeComments() {
+        comments--;
         calculateScore();
     }
 

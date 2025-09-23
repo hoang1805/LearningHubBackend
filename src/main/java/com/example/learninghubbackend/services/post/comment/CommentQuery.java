@@ -17,4 +17,12 @@ public class CommentQuery {
     public Comment save(Comment comment) {
         return commentRepository.save(comment);
     }
+
+    public void delete(Long id) {
+        commentRepository.deleteById(id);
+    }
+
+    public void delete(Comment comment) {
+        commentRepository.delete(comment);
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.learninghubbackend.dtos.responses.post;
 
-import com.example.learninghubbackend.services.post.vote.VoteType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +8,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor
