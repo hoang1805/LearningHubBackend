@@ -13,6 +13,10 @@ public enum ObjectType {
     GROUP_INVITATION("app.group.invitation"),
 
     TOKEN("app.token"),
+
+    POST("app.post"),
+    COMMENT("app.comment"),
+    VOTE("app.vote"),
     ;
 
     private final String value;

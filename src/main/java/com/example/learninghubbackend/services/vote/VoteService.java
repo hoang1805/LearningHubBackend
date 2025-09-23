@@ -1,0 +1,39 @@
+package com.example.learninghubbackend.services.vote;
+
+import com.example.learninghubbackend.commons.models.ObjectType;
+import com.example.learninghubbackend.models.Vote;
+import com.example.learninghubbackend.repositories.post.VoteRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class VoteService {
+    private final VoteRepository voteRepository;
+
+    public Vote get(Long id) {
+        return voteRepository.findById(id).orElse(null);
+    }
+
+    public Vote get(Long objectId, ObjectType objectType, Long userId) {
+        return voteRepository.findByObjectIdAndObjectTypeAndUserId(objectId, objectType, userId).orElse(null);
+    }
+
+    public Vote save(Vote vote) {
+        return voteRepository.save(vote);
+    }
+
+    public boolean update(Vote vote, VoteType type) {
+        if (vote.getType() == type) {
+            return false;
+        }
+
+        vote.setType(type);
+        voteRepository.save(vote);
+        return true;
+    }
+
+    public void delete(Vote vote) {
+        voteRepository.delete(vote);
+    }
+}
