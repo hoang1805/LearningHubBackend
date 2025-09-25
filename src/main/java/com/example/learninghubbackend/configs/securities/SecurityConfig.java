@@ -33,7 +33,7 @@ public class SecurityConfig {
         http.cors(cors -> cors.configurationSource(getCorsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/public/**").permitAll()
+                        .requestMatchers("/api/auth/v1/login", "/api/auth/v1/register", "/api/auth/v1/refresh", "/api/public/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e.accessDeniedHandler(customAccessDeniedHandler).authenticationEntryPoint(customAuthenticationEntryPoint))
                 .securityContext(securityContext -> securityContext.securityContextRepository(new NullSecurityContextRepository()))

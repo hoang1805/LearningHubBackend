@@ -1,11 +1,9 @@
 package com.example.learninghubbackend.models;
 
+import com.example.learninghubbackend.commons.ClientInfo;
 import com.example.learninghubbackend.commons.models.ObjectType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "sessions")
@@ -42,6 +40,13 @@ public class Session extends BaseModel {
         this.os = os;
         this.browser = browser;
         this.ipAddress = ipAddress;
+    }
+
+    public boolean verify(@NonNull ClientInfo clientInfo) {
+        return this.getIpAddress().equals(clientInfo.getIpAddress())
+                && this.getOs().equals(clientInfo.getOs())
+                && this.getBrowser().equals(clientInfo.getBrowser())
+                && this.getDevice().equals(clientInfo.getDevice());
     }
 
     @Override
