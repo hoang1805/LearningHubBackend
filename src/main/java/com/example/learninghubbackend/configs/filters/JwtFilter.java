@@ -47,7 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
             Session session = sessionService.query().getSession(payload.getSessionId());
             boolean active = false;
             if (session != null && session.getUserId().equals(payload.getUserId()) && !session.isRevoked()) {
-                active = verifyClient(clientInfo, session);
+                active = session.verify(clientInfo);
             }
 
             if (active) {
@@ -64,12 +64,5 @@ public class JwtFilter extends OncePerRequestFilter {
         } finally {
             filterChain.doFilter(request, response);
         }
-    }
-
-    private boolean verifyClient(@NonNull ClientInfo clientInfo, @NonNull Session session) {
-        return clientInfo.getIpAddress().equals(session.getIpAddress())
-                && clientInfo.getOs().equals(session.getOs())
-                && clientInfo.getBrowser().equals(session.getBrowser())
-                && clientInfo.getDevice().equals(session.getDevice());
     }
 }
